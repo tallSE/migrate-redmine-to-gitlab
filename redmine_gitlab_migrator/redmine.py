@@ -70,7 +70,7 @@ class RedmineProject(Project):
         log.info('Got redmine project: {}'.format(self.get_id()))
 
     def get_id(self):
-        return str(self.project['id'])
+        return str(self.project.get('id', 0))
 
     def get_project(self):
         return self.project

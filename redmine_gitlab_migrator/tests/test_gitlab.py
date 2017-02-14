@@ -1,24 +1,7 @@
 import unittest
 
 from .fake import FakeGitlabClient
-from redmine_gitlab_migrator.gitlab import GitlabInstance, GitlabProject
-
-
-class GitlabinstanceTestCase(unittest.TestCase):
-    def setUp(self):
-        self.client = FakeGitlabClient()
-
-    def test_check_users_exist(self):
-        gitlab = GitlabInstance('http://localhost:3000', self.client)
-
-        self.assertEqual(gitlab.check_users_exist(
-            ['john_smith', 'jack_smith']), True)
-        self.assertEqual(gitlab.check_users_exist(
-            ['john_smith']), True)
-        self.assertEqual(gitlab.check_users_exist(
-            ['john_smith', 'babar']), False)
-        self.assertEqual(
-            gitlab.check_users_exist([]), True)
+from redmine_gitlab_migrator.gitlab import  GitlabProject
 
 
 class GitlabprojectTestCase(unittest.TestCase):

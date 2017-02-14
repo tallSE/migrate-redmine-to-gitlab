@@ -220,7 +220,9 @@ class FakeGitlabClient:
                 "http://example.com/uploads/project/avatar/3/uploads/avr.png"
             }
 
-        elif url.endswith('/projects/diaspora%2Fdiaspora-project-site/issues'):
+        elif url.endswith('/projects/3/issues?page=2&per_page=100'):
+            return []
+        elif url.endswith('/projects/3/issues?page=1&per_page=100'):
             return [
                 {
                     "id": 43,
@@ -284,7 +286,7 @@ class FakeGitlabClient:
             ]
 
         elif url.endswith(
-                '/projects/diaspora%2Fdiaspora-project-site/members'):
+                '/projects/3/members'):
             return [JACK, JOHN]
 
         elif (url.endswith('/projects/6') or
@@ -330,10 +332,10 @@ class FakeGitlabClient:
                 "archived": False,
                 "avatar_url": None
             }
-        elif url.endswith('/projects/brightbox%2Fpuppet/issues'):
+        elif url.endswith('/projects/6/issues?page=1&per_page=100'):
             return []
 
-        elif url.endswith('/projects/brightbox%2Fpuppet/members'):
+        elif url.endswith('/projects/6/members'):
             return []
 
         else:
@@ -430,7 +432,7 @@ class FakeRedmineClient:
             raise ValueError('{} is unknown data test'.format(url))
 
     def get(self, url):
-        if url.endswith('projects/brightbox/puppet.json'):
+        if url.endswith('projects/puppet.json'):
             return {
                 "project": {
                     "updated_on": "2015-06-11T09:21:13Z",
