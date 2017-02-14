@@ -77,14 +77,6 @@ Install it:
 
 (or if you cloned the git: `python setup.py install`)
 
-You can then give it a check without touching anything:
-
-    migrate-rg issues --redmine-key xxxx --gitlab-key xxxx \
-      <redmine project url> <gitlab project url> --check
-
-The `--check` here prevents any writing , it's available on all
-commands.
-
     migrate-rg --help
 
 Migration process
@@ -118,7 +110,7 @@ Download all redmine data once for all
 If you do use roadmaps, redmine *versions* will be converted to gitlab
 *milestones*. If you don't, just skip this step.
 
-    migrate-rg roadmap --redmine-key xxxx --gitlab-key xxxx \
+    migrate-rg roadmap --redmine-key xxxx --cache-dir xxx --gitlab-key xxxx \
       https://redmine.example.com/projects/myproject \
       http://git.example.com/mygroup/myproject --check
 
@@ -150,6 +142,8 @@ Note that your issue titles will be annotated with the original redmine issue
 ID, like *-RM-1186-MR-logging*. This annotation will be used (and removed) by
 the next step.
 
+*(remove `--check` to perform it for real, same applies for other commands)*
+
 ### Migrate Issues ID (iid) (optional)
 
 You can retain the issues ID from redmine, **this cannot be done via REST
@@ -161,6 +155,8 @@ commad with sufficient rights, from there:
     migrate-rg iid --redmine --redmine-key xxxx --gitlab-key xxxx \
       https://redmine.example.com/projects/myproject \
       http://git.example.com/mygroup/myproject --check
+
+*(remove `--check` to perform it for real, same applies for other commands)*
 
 ### Delete all issues of a project
 
