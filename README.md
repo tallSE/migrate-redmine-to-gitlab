@@ -5,9 +5,10 @@ Redmine to Gitlab migrator
 
 Migrate code projects from Redmine to Gitlab, keeping issues/milestones/metadata
 
-*Note: although certainly not bugfree, this tool has been used at @oasiswork
- to migrate 30+ projects with 1000+ issues, and some attention is paid to
- keeping data. Was also used by @ultreia.io to migrate some pretty big projects.*
+*Note: The project was init by  [oasiswork](oasiswork/redmine-gitlab-migrator). 
+       Was then used by @ultreia.io to migrate some pretty big projects.*
+
+Enjoy.
 
 Does
 ----
