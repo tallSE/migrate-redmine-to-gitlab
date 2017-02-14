@@ -1,13 +1,13 @@
 Redmine to Gitlab migrator
 ==========================
 
-[![Build Status](https://travis-ci.org/oasiswork/redmine-gitlab-migrator.svg?branch=master)](https://travis-ci.org/oasiswork/redmine-gitlab-migrator) [![PyPI version](https://badge.fury.io/py/redmine-gitlab-migrator.svg)](https://badge.fury.io/py/redmine-gitlab-migrator)
+[![Build Status](https://travis-ci.org/ultreia-io/redmine-gitlab-migrator.svg?branch=master)](https://travis-ci.org/ultreia-io/redmine-gitlab-migrator) [![PyPI version](https://badge.fury.io/py/redmine-gitlab-migrate.svg)](https://badge.fury.io/py/redmine-gitlab-migrate)
 
 Migrate code projects from Redmine to Gitlab, keeping issues/milestones/metadata
 
 *Note: although certainly not bugfree, this tool has been used at @oasiswork
  to migrate 30+ projects with 1000+ issues, and some attention is paid to
- keeping data.*
+ keeping data. Was also used by @ultreia.io to migrate some pretty big projects.*
 
 Does
 ----
@@ -15,6 +15,7 @@ Does
 - Per-project migrations
 - Migration of issues, keeping as much metadata as possible:
   - redmine trackers become tags
+  - an extra Redmine tag is added on each issue
   - issues comments are kept and assigned to the right users
   - issues final status (open/closed) are kept along with open/close date (not
     detailed status history)
@@ -22,6 +23,7 @@ Does
   - issues numbers (ex: `#123`)
   - issues/notes authors
   - issue/notes original dates, but as comments
+  - issue/attachments
   - relations (although gitlab model for relations is simpler)
 - Migration of Versions/Roadmaps keeping:
   - issues composing the version
@@ -57,7 +59,7 @@ Requires
 - No preexisting issues on gitlab project
 - Already synced users (those required in the project you are migrating)
 
-(It was developed/tested arround redmine 2.5.2, gitlab 8.2.0, python 3.4)
+(It was developed/tested around redmine 2.5.2, gitlab 8.2.0, python 3.4)
 
 
 Let's go
@@ -69,7 +71,7 @@ up to you.
 
 Install it:
 
-    pip install redmine-gitlab-migrator
+    pip install redmine-gitlab-migrate
 
 
 (or if you cloned the git: `python setup.py install`)
@@ -102,6 +104,14 @@ should be added to the gitlab project.
 If a corresponding user can't be found in gitlab, the issue/comment will be
 assigned to the gitlab admin user.
 
+
+### Download redmine data
+
+Download all redmine data once for all
+
+    migrate-rg download-redmine --redmine-key xxxx --cache-dir xxxx \
+      https://redmine.example.com/projects/myproject
+
 ### Migrate Roadmap
 
 If you do use roadmaps, redmine *versions* will be converted to gitlab
@@ -113,9 +123,25 @@ If you do use roadmaps, redmine *versions* will be converted to gitlab
 
 *(remove `--check` to perform it for real, same applies for other commands)*
 
-### Migrate issues
+### Migrate Attachments
 
-    migrate-rg issues --redmine-key xxxx --gitlab-key xxxx \
+This will upload all issues attachments.
+
+    migrate-rg attachments --redmine-key xxxx --cache-dir xxx --gitlab-key xxxx \
+      https://redmine.example.com/projects/myproject \
+      http://git.example.com/mygroup/myproject --check
+
+*(remove `--check` to perform it for real, same applies for other commands)*
+
+### Migrate issues (without adding redmine id in title)
+
+    migrate-rg issues --redmine-key xxxx --cache-dir xxx --gitlab-key xxxx \
+      https://redmine.example.com/projects/myproject \
+      http://git.example.com/mygroup/myproject --check
+
+### Migrate issues (with adding redmine id in title)
+
+    migrate-rg issues-with-id --redmine-key xxxx --cache-dir xxx --gitlab-key xxxx \
       https://redmine.example.com/projects/myproject \
       http://git.example.com/mygroup/myproject --check
 
@@ -123,7 +149,7 @@ Note that your issue titles will be annotated with the original redmine issue
 ID, like *-RM-1186-MR-logging*. This annotation will be used (and removed) by
 the next step.
 
-### Migrate Issues ID (iid)
+### Migrate Issues ID (iid) (optional)
 
 You can retain the issues ID from redmine, **this cannot be done via REST
 API**, thus it requires **direct access to the gitlab machine**.
@@ -135,6 +161,10 @@ commad with sufficient rights, from there:
       https://redmine.example.com/projects/myproject \
       http://git.example.com/mygroup/myproject --check
 
+### Delete all issues of a project
+
+    migrate-rg delete-issues --gitlab-key xxxx \
+      http://git.example.com/mygroup/myproject
 
 ### Import git repository
 

@@ -10,14 +10,14 @@ except IOError:
     README = ''
 
 setup(
-    name='redmine-gitlab-migrator',
-    version='1.0.2',
+    name='redmine-gitlab-migrate',
+    version='2.0.1',
     description='Migrate a redmine project to gitlab',
     long_description=README,
-    author='Jocelyn Delalande',
-    author_email='jdelalande@oasiswork.fr',
+    author='Tony Chemit',
+    author_email='dev@tchemit.fr',
     license='GPL',
-    url='https://github/oasiswork/migrate-redmine-to-gitlab/',
+    url='https://github/ultreia-io/redmine-to-gitlab-migrator/',
     packages=['redmine_gitlab_migrator'],
     install_requires=['requests'],
     entry_points={

@@ -33,6 +33,16 @@ class APIClient:
         log.debug('HTTP RESPONSE {}'.format(ret))
         return ret
 
+    def _req2(self, func, *args, **kwargs):
+        log.debug('HTTP REQUEST {} {} {}'.format(
+            func, args, kwargs))
+        kwargs = self.add_auth_headers(kwargs)
+        resp = func(*args, **kwargs)
+        resp.raise_for_status()
+        ret = resp.content
+        log.debug('HTTP RESPONSE {}'.format(len(ret)))
+        return ret
+
     def get(self, *args, **kwargs):
         return self._req(requests.get, *args, **kwargs)
 
@@ -41,6 +51,12 @@ class APIClient:
 
     def put(self, *args, **kwargs):
         return self._req(requests.put, *args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        return self._req(requests.delete, *args, **kwargs)
+
+    def load(self, *args, **kwargs):
+        return self._req2(requests.get, *args, **kwargs)
 
 
 class Project:

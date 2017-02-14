@@ -4,6 +4,8 @@
 *.lock
 *.db
 build/
+dist
+.idea
 .coverage
 .cache
 *.egg-info

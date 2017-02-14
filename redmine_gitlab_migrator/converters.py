@@ -3,8 +3,8 @@
 
 import logging
 
-
 log = logging.getLogger(__name__)
+
 
 # Utils
 
@@ -42,7 +42,7 @@ def convert_notes(redmine_issue_journals, redmine_user_index):
             except KeyError:
                 # In some cases you have anonymous notes, which do not exist in
                 # gitlab.
-                log.warning(
+                log.debug(
                     'Redmine user {} is unknown, attribute note '
                     'to current admin\n'.format(entry['user']))
                 author = None
@@ -71,8 +71,8 @@ def relations_to_string(relations, issue_id):
 
 # Convertor
 
-def convert_issue(redmine_issue, redmine_user_index, gitlab_user_index,
-                  gitlab_milestones_index):
+def convert_issue(redmine_issue, redmine_user_index, redmine_attachments_index, gitlab_project_id, gitlab_user_index,
+                  gitlab_milestones_index, with_id=False):
     if redmine_issue.get('closed_on', None):
         # quick'n dirty extract date
         close_text = ', closed on {}'.format(redmine_issue['closed_on'][:10])
@@ -86,16 +86,21 @@ def convert_issue(redmine_issue, redmine_user_index, gitlab_user_index,
     if len(relations_text) > 0:
         relations_text = ', ' + relations_text
 
+    if with_id:
+        title = '-RM-{}-MR-{}'.format(redmine_issue['id'], redmine_issue['subject'])
+    else:
+        title = redmine_issue['subject']
     data = {
-        'title': '-RM-{}-MR-{}'.format(
-            redmine_issue['id'], redmine_issue['subject']),
-        'description': '{}\n\n*(from redmine: created on {}{}{})*'.format(
+        'title': title,
+        'redmine_id': redmine_issue['id'],
+        'description': '{}\n\n*(from redmine issue {} created on {}{}{})*'.format(
             redmine_issue['description'],
+            redmine_issue['id'],
             redmine_issue['created_on'][:10],
             close_text,
             relations_text
         ),
-        'labels': [redmine_issue['tracker']['name']]
+        'labels': 'Redmine,' + redmine_issue['tracker']['name']
     }
 
     version = redmine_issue.get('fixed_version', None)
@@ -107,16 +112,21 @@ def convert_issue(redmine_issue, redmine_user_index, gitlab_user_index,
             redmine_issue['author']['id'], redmine_user_index)
 
     except KeyError:
-        log.warning(
+        log.debug(
             'Redmine issue #{} is anonymous, gitlab issue is attributed '
             'to current admin\n'.format(redmine_issue['id']))
         author_login = None
 
+    attachments = []
+    for a in redmine_issue.get('attachments', []):
+        attachment = redmine_attachments_index[a['id']]
+        attachments.append(convert_attachment(gitlab_project_id, attachment))
+
     meta = {
         'sudo_user': author_login,
-        'notes': list(convert_notes(redmine_issue['journals'],
-                                    redmine_user_index)),
-        'must_close': closed
+        'notes': list(convert_notes(redmine_issue['journals'], redmine_user_index)),
+        'must_close': closed,
+        'attachments': attachments
     }
 
     assigned_to = redmine_issue.get('assigned_to', None)
@@ -148,3 +158,7 @@ def convert_version(redmine_version):
     must_close = redmine_version['status'] == 'closed'
 
     return milestone, {'must_close': must_close}
+
+
+def convert_attachment(gitlab_project_id, redmine_attachment):
+    return {"redmine": redmine_attachment, "request": {"id": gitlab_project_id, "file": redmine_attachment['filename']}}
