@@ -370,10 +370,8 @@ def perform_migrate_attachments(args):
         issues_data = (convert_issue(i, redmine_users_index, attachments_index, gitlab_project_id, gitlab_users_index,
                                      milestones_index) for i in issues)
 
-        created_attachments, bad_attachments2 = _create_attachments(gitlab_project, issues_data, bad_attachments)
+        created_attachments, bad_attachments = _create_attachments(gitlab_project, issues_data, bad_attachments)
         gitlab_attachments += created_attachments
-        bad_attachments.clear()
-        bad_attachments += bad_attachments2
 
     redmine_cache = RedmineCacheWriter(args.cache_dir, redmine_project)
 
@@ -400,8 +398,8 @@ def _create_attachments(gitlab_project, attachments_data, incoming_bad_attachmen
                     log.info("Created attachment (was: {}) {}".format(data_id, created_attachment['markdown']))
                 except:
                     bad_attachments.append(data_id)
-                    log.error('Could not create attachment {} (size: {})'.format(data_redmine_['filename'],
-                                                                                 data_redmine_['filesize']))
+                    log.error('Could not create attachment {} {} (size: {})'.format(data_id, data_redmine_['filename'],
+                                                                                    data_redmine_['filesize']))
     return created_attachments, bad_attachments
 
 
