@@ -1,7 +1,7 @@
 import unittest
 
 from .fake import FakeGitlabClient
-from redmine_gitlab_migrator.gitlab import  GitlabProject
+from migrate_redmine_to_gitlab.gitlab import  GitlabProject
 
 
 class GitlabprojectTestCase(unittest.TestCase):

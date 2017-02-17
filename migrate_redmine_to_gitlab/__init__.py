@@ -64,7 +64,7 @@ class Project:
         self.public_url = url.strip('/')  # normalize URL
         self.api = client
 
+        # noinspection PyUnresolvedReferences
         self._url_match = self.REGEX_PROJECT_URL.match(self.public_url)
         if self._url_match is None:
-            raise ValueError(
-                '{} is not a valid project URL'.format(url))
+            raise ValueError('{} is not a valid project URL'.format(url))

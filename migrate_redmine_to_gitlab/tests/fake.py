@@ -343,7 +343,7 @@ class FakeGitlabClient:
 
 
 class FakeRedmineClient:
-    def unpaginated_get(self, url):
+    def get_all_pages(self, url):
         if '/projects/puppet/issues.json' in url:
             return []
 

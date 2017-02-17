@@ -1,12 +1,6 @@
-""" Convert Redmine objects to gitlab's
-"""
-
 import logging
 
 log = logging.getLogger(__name__)
-
-
-# Utils
 
 
 def redmine_uid_to_login(redmine_id, redmine_user_index):
@@ -26,9 +20,9 @@ def convert_notes(redmine_issue_journals, redmine_user_index):
     Adds metadata as comment
 
     :param redmine_issue_journals: list of redmine "journals"
+    :param redmine_user_index: dictionary of redmine users
     :return: yielded couple ``data``, ``meta``. ``data`` is the API payload for
-        an issue note and meta a dict (containing, at the moment, only a
-        "sudo_user" key).
+        an issue note and meta a dict (containing, at the moment, only a "sudo_user" key).
     """
 
     for entry in redmine_issue_journals:
@@ -50,7 +44,7 @@ def convert_notes(redmine_issue_journals, redmine_user_index):
 
 
 def relations_to_string(relations, issue_id):
-    """ Convert redmine formal relations to some denormalized string
+    """ Convert redmine formal relations to some un-normalized string
 
     That's the way gitlab does relations, by "mentioning".
 
@@ -69,10 +63,13 @@ def relations_to_string(relations, issue_id):
     return ', '.join(l)
 
 
-# Convertor
-
-def convert_issue(redmine_issue, redmine_user_index, redmine_attachments_index, gitlab_project_id, gitlab_user_index,
-                  gitlab_milestones_index, with_id=False):
+def convert_issue(redmine_issue,
+                  redmine_user_index,
+                  redmine_attachments_index,
+                  gitlab_project_id,
+                  gitlab_user_index,
+                  gitlab_milestones_index,
+                  with_id=False):
     if redmine_issue.get('closed_on', None):
         # quick'n dirty extract date
         close_text = ', closed on {}'.format(redmine_issue['closed_on'][:10])
@@ -90,6 +87,9 @@ def convert_issue(redmine_issue, redmine_user_index, redmine_attachments_index, 
         title = '-RM-{}-MR-{}'.format(redmine_issue['id'], redmine_issue['subject'])
     else:
         title = redmine_issue['subject']
+
+    labels = 'From Redmine, ' + redmine_issue['tracker']['name'] + ', ' + redmine_issue['priority']['name']
+
     data = {
         'title': title,
         'redmine_id': redmine_issue['id'],
@@ -100,7 +100,7 @@ def convert_issue(redmine_issue, redmine_user_index, redmine_attachments_index, 
             close_text,
             relations_text
         ),
-        'labels': 'Redmine,' + redmine_issue['tracker']['name']
+        'labels': labels
     }
 
     version = redmine_issue.get('fixed_version', None)
@@ -131,8 +131,7 @@ def convert_issue(redmine_issue, redmine_user_index, redmine_attachments_index, 
 
     assigned_to = redmine_issue.get('assigned_to', None)
     if assigned_to is not None:
-        data['assignee_id'] = redmine_uid_to_gitlab_uid(
-            assigned_to['id'], redmine_user_index, gitlab_user_index)
+        data['assignee_id'] = redmine_uid_to_gitlab_uid(assigned_to['id'], redmine_user_index, gitlab_user_index)
     return data, meta
 
 
@@ -148,6 +147,7 @@ def convert_version(redmine_version):
     """
     milestone = {
         "title": redmine_version['name'],
+        'redmine_id': redmine_version['id'],
         "description": '{}\n\n*(from redmine: created on {})*'.format(
             redmine_version['description'],
             redmine_version['created_on'][:10])
@@ -158,6 +158,15 @@ def convert_version(redmine_version):
     must_close = redmine_version['status'] == 'closed'
 
     return milestone, {'must_close': must_close}
+
+
+def convert_attachments(redmine_issue, redmine_attachments_index, gitlab_project_id):
+    attachments = []
+    for redmine_attachment in redmine_issue.get('attachments', []):
+        attachment = redmine_attachments_index[redmine_attachment['id']]
+        attachments.append(convert_attachment(gitlab_project_id, attachment))
+
+    return attachments
 
 
 def convert_attachment(gitlab_project_id, redmine_attachment):

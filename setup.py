@@ -10,22 +10,22 @@ except IOError:
     README = ''
 
 setup(
-    name='redmine-gitlab-migrate',
-    version='2.0.1',
+    name='migrate-redmine-to-gitlab',
+    version='1.0.0',
     description='Migrate a redmine project to gitlab',
     long_description=README,
     author='Tony Chemit',
     author_email='dev@tchemit.fr',
     license='GPL',
     url='https://github/ultreia-io/redmine-to-gitlab-migrator/',
-    packages=['redmine_gitlab_migrator'],
+    packages=['migrate_redmine_to_gitlab'],
     install_requires=['requests'],
     entry_points={
         'console_scripts': [
-            'migrate-rg = redmine_gitlab_migrator.commands:main'
+            'migrate-redmine-to-gitlab = migrate_redmine_to_gitlab.commands:main'
         ]
     },
-    test_suite='redmine_gitlab_migrator.tests',
+    test_suite='migrate_redmine_to_gitlab.tests',
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'
     ]

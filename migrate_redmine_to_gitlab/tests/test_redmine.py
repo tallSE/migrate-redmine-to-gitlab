@@ -1,7 +1,7 @@
 import unittest
 
 from .fake import FakeRedmineClient
-from redmine_gitlab_migrator.redmine import RedmineProject
+from migrate_redmine_to_gitlab.redmine import RedmineProject
 
 
 class RedmineTestCase(unittest.TestCase):

@@ -20,6 +20,7 @@ class RedmineClient(APIClient):
     def get(self, *args, **kwargs):
         # In detail views, redmine encapsulate "foo" typed objects under a
         # "foo" key on the JSON.
+        # noinspection PyCompatibility
         ret = super().get(*args, **kwargs)
         values = ret.values()
         if len(values) == 1:
@@ -27,7 +28,7 @@ class RedmineClient(APIClient):
         else:
             return ret
 
-    def unpaginated_get(self, *args, **kwargs):
+    def get_all_pages(self, *args, **kwargs):
         """ Iterates over API pagination for a given resource list
         """
         kwargs['params'] = kwargs.get('params', {})
@@ -35,9 +36,9 @@ class RedmineClient(APIClient):
 
         resp = self.get(*args, **kwargs)
 
-        # Try to autofind the top-level key containing
+        # Try to auto find the top-level key containing
         keys_candidates = (
-            set(resp.keys()) - set(['total_count', 'offset', 'limit']))
+            set(resp.keys()) - {'total_count', 'offset', 'limit'})
 
         assert len(keys_candidates) == 1
         res_list_key = list(keys_candidates)[0]
@@ -62,7 +63,8 @@ class RedmineProject(Project):
         r'^(?P<base_url>https?://.*)/project/(?P<category_name>[\w_-]+)/(?P<project_name>[\w_-]+)/?$')
 
     def __init__(self, url, *args, **kwargs):
-        normalized_url = self._canonicalize_url(url)
+        normalized_url = self._remove_category_in_url(url)
+        # noinspection PyCompatibility
         super().__init__(normalized_url, *args, **kwargs)
         self.api_url = '{}.json'.format(self.public_url)
         self.instance_url = self._url_match.group('base_url')
@@ -76,8 +78,8 @@ class RedmineProject(Project):
         return self.project
 
     @classmethod
-    def _canonicalize_url(cls, url):
-        """ If using caterogies, return the category-less URL
+    def _remove_category_in_url(cls, url):
+        """ If using categories, return the category-less URL
 
         eg:
           - category URL: https://example.com/project/dev/foobar/
@@ -92,7 +94,7 @@ class RedmineProject(Project):
             return url
 
     def get_all_issues(self):
-        issues = self.api.unpaginated_get(
+        issues = self.api.get_all_pages(
             '{}/issues.json?status_id=*'.format(self.public_url))
         detailed_issues = []
         # It's impossible to get issue history from list view, so get it from
@@ -122,19 +124,16 @@ class RedmineProject(Project):
         """
         user_ids = set()
         users = []
-        for i in issues:
-            for i in chain(i.get('watchers', []),
-                           [i['author'], i.get('assigned_to', None)]):
-
-                if i is None:
+        for issue in issues:
+            for user in chain(issue.get('watchers', []), [issue['author'], issue.get('assigned_to', None)]):
+                if user is None:
                     continue
-                user_ids.add(i['id'])
+                user_ids.add(user['id'])
 
-        for i in user_ids:
+        for user_id in user_ids:
             # The anonymous user is not really part of the project...
-            if i != ANONYMOUS_USER_ID:
-                users.append(self.api.get('{}/users/{}.json'.format(
-                    self.instance_url, i)))
+            if user_id != ANONYMOUS_USER_ID:
+                users.append(self.api.get('{}/users/{}.json'.format(self.instance_url, user_id)))
         return users
 
     def get_users_index(self):
@@ -154,41 +153,19 @@ class RedmineProjectWithCache(Project):
     REGEX_PROJECT_URL = re.compile(
         r'^(?P<base_url>https?://.*)/projects/(?P<project_name>[\w_-]+)$')
 
-    REGEX_CATEGORY_PROJECT_URL = re.compile(
-        r'^(?P<base_url>https?://.*)/project/(?P<category_name>[\w_-]+)/(?P<project_name>[\w_-]+)/?$')
-
     def __init__(self, url, cache_dir, *args, **kwargs):
-        normalized_url = self._canonicalize_url(url)
-        super().__init__(normalized_url, *args, **kwargs)
-        self.api_url = '{}.json'.format(self.public_url)
-        self.instance_url = self._url_match.group('base_url')
-        self.project = self.api.get(self.api_url)
+        # noinspection PyCompatibility
+        super().__init__(url, *args, **kwargs)
+        self.path = cache_dir
+        with open(os.path.join(self.path, 'project.json'), 'r') as outfile:
+            self.project = json.load(outfile)
         log.info('Got redmine project: {}'.format(self.get_id()))
-
-        self.path = os.path.join(cache_dir, 'redmine', self.get_id())
-        log.info('Redmine Cache dir: {}'.format(self.path))
 
     def get_id(self):
         return str(self.project['id'])
 
     def get_project(self):
         return self.project
-
-    @classmethod
-    def _canonicalize_url(cls, url):
-        """ If using caterogies, return the category-less URL
-
-        eg:
-          - category URL: https://example.com/project/dev/foobar/
-          - category-less URL: https://example.com/projects/foobar/
-
-        API endpoints are reachable only for category-less URLs.
-        """
-        m = cls.REGEX_CATEGORY_PROJECT_URL.match(url)
-        if m:
-            return '{base_url}/projects/{project_name}'.format(**m.groupdict())
-        else:
-            return url
 
     def get_all_issues(self):
         data = self._load_data(os.path.join(self.path, 'issues'))
@@ -210,7 +187,8 @@ class RedmineProjectWithCache(Project):
     def get_attachments_index(self):
         return {i['id']: i for i in self.get_attachments()}
 
-    def _load_data(self, path):
+    @staticmethod
+    def _load_data(path):
         result = []
         for entry in os.scandir(path):
             if entry.is_file() and str(entry.path).endswith('.json'):
@@ -222,7 +200,7 @@ class RedmineProjectWithCache(Project):
 
 class RedmineCacheWriter:
     def __init__(self, cache_dir, project):
-        self.path = os.path.join(cache_dir, 'redmine', project.get_id())
+        self.path = cache_dir
         log.info('Redmine Cache dir: {}'.format(self.path))
         self.project = project
         self._create_dir(self.path)
@@ -293,19 +271,30 @@ class RedmineCacheWriter:
         path = os.path.join(self.path, 'attachments')
         self._store_data(path, attachment, attachment['id'], 'Attachment')
 
-    def _create_dir(self, path):
+    def load_issue(self, issue):
+        path = os.path.join(self.path, 'issues')
+        self._store_data(path, issue, issue['id'], 'Issue')
+
+    def load_version(self, version):
+        path = os.path.join(self.path, 'versions')
+        self._store_data(path, version, version['id'], 'Version')
+
+    @staticmethod
+    def _create_dir(path):
         if not os.path.exists(path):
             os.makedirs(path)
             log.info('Create cache dir: {}'.format(path))
 
-    def _store_data(self, path, data, id, msg):
-        file = os.path.join(path, '{}.json'.format(id))
+    @staticmethod
+    def _store_data(path, data, data_id, msg):
+        file = os.path.join(path, '{}.json'.format(data_id))
         with open(file, 'w') as outfile:
             json.dump(data, outfile)
-        log.info('{} {} to {}'.format(msg, id, file))
-        log.debug('{} {} = {}'.format(msg, id, data))
+        log.info('{} {} to {}'.format(msg, data_id, file))
+        log.debug('{} {} = {}'.format(msg, data_id, data))
 
-    def _load_data(self, path):
+    @staticmethod
+    def _load_data(path):
         result = []
         for entry in os.scandir(path):
             if entry.is_file() and str(entry.path).endswith('.json'):

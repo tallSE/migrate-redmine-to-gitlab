@@ -1,7 +1,7 @@
 import unittest
 
 from .fake import JOHN, JACK, REDMINE_ISSUE_1439, REDMINE_ISSUE_1732
-from redmine_gitlab_migrator.converters import (
+from migrate_redmine_to_gitlab.converters import (
     convert_issue, convert_version, relations_to_string)
 
 
@@ -40,7 +40,7 @@ class ConvertorTestCase(unittest.TestCase):
         self.assertEqual(gitlab_issue, {
             'title': '-RM-1732-MR-Update doc for v1',
             'description': 'The doc is a bit old\n\n*(from redmine issue 1732 created on 2015-08-21, closed on 2015-09-09)*',
-            'labels': 'Redmine,Evolution',
+            'labels': 'From Redmine, Evolution, Urgent',
             'redmine_id': 1732,
             'assignee_id': JOHN['id'],
         })
@@ -67,7 +67,7 @@ class ConvertorTestCase(unittest.TestCase):
         self.assertEqual(gitlab_issue, {
             'title': '-RM-1439-MR-Support SSL',
             'description': '\n\n*(from redmine issue 1439 created on 2015-04-03, relates #1430)*',
-            'labels': 'Redmine,Evolution',
+            'labels': 'From Redmine, Evolution, Normal',
             'redmine_id': 1439,
             'milestone_id': 3,
         })
@@ -92,6 +92,7 @@ class ConvertorTestCase(unittest.TestCase):
         gitlab_milestone, meta = convert_version(redmine_version)
         self.assertEqual(gitlab_milestone, {
             "title": "v0.11",
+            'redmine_id': 66,
             "description": ("First public version\n\n*"
                             "(from redmine: created on 2015-11-16)*"),
         })

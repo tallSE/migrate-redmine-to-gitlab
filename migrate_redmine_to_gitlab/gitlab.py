@@ -15,6 +15,7 @@ class GitlabClient(APIClient):
         # be fixed though...
         kwargs['params'] = kwargs.get('params', {})
         kwargs['params']['per_page'] = self.MAX_PER_PAGE
+        # noinspection PyCompatibility
         return super().get(*args, **kwargs)
 
     def get_auth_headers(self):
@@ -29,6 +30,7 @@ class GitlabProject(Project):
         r'^(?P<base_url>https?://.*/)(?P<namespace>[^/]+)/(?P<project_name>[\w_-]+)$')
 
     def __init__(self, *args, **kwargs):
+        # noinspection PyCompatibility
         super().__init__(*args, **kwargs)
         self.api_url0 = ('{base_url}api/v3/projects/{namespace}%2F{project_name}'.format(**self._url_match.groupdict()))
         self.project = self.get_project()
@@ -69,7 +71,7 @@ class GitlabProject(Project):
                 gitlab_attachment = redmine_attachment.get('gitlab', None)
                 if gitlab_attachment is None:
                     attachment_log += '\n  * [{}] ({})'.format(redmine_attachment['filename'],
-                                                                redmine_attachment['content_url'])
+                                                               redmine_attachment['content_url'])
                 else:
                     attachment_log += '\n  * [{}] ({})'.format(gitlab_attachment['alt'], gitlab_attachment['url'])
             data['description'] += attachment_log
@@ -87,6 +89,7 @@ class GitlabProject(Project):
         # Handle closed status
         if meta['must_close']:
             altered_issue = issue.copy()
+            altered_issue['labels'] = data['labels']
             altered_issue['state_event'] = 'close'
             self.api.put(issue_url, data=altered_issue)
 
@@ -118,7 +121,7 @@ class GitlabProject(Project):
         page = 1
         found_issues = self.api.get('{}/issues?page={}&per_page=100'.format(self.api_url, page))
         while len(found_issues) > 0:
-            issues+= found_issues
+            issues += found_issues
             page += 1
             found_issues = self.api.get('{}/issues?page={}&per_page=100'.format(self.api_url, page))
         return issues
@@ -128,6 +131,7 @@ class GitlabProject(Project):
 
     def get_milestones(self):
         if not hasattr(self, '_cache_milestones'):
+            # noinspection PyAttributeOutsideInit
             self._cache_milestones = self.api.get(
                 '{}/milestones'.format(self.api_url))
         return self._cache_milestones
@@ -142,6 +146,7 @@ class GitlabProject(Project):
                 return i
         raise ValueError('Could not get milestone')
 
+    # noinspection SpellCheckingInspection
     def has_members(self, usernames):
         gitlab_user_names = set([i['username'] for i in self.get_members()])
         return all((i in gitlab_user_names for i in usernames))
