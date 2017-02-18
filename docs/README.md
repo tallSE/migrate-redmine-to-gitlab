@@ -1,17 +1,14 @@
-Redmine to Gitlab migrator
-==========================
+# Redmine to Gitlab migrator
 
-[![Build Status](https://travis-ci.org/ultreia-io/redmine-gitlab-migrator.svg?branch=master)](https://travis-ci.org/ultreia-io/redmine-gitlab-migrator) [![PyPI version](https://badge.fury.io/py/redmine-gitlab-migrate.svg)](https://badge.fury.io/py/redmine-gitlab-migrate)
+[![Build Status](https://travis-ci.org/ultreia-io/migrate-redmine-to-gitlab.svg?branch=master)](https://travis-ci.org/ultreia-io/migrate-redmine-to-gitlab) [![PyPI version](https://badge.fury.io/py/redmine-gitlab-migrate.svg)](https://badge.fury.io/py/migrate-redmine-to-gitlab)
 
-Migrate code projects from Redmine to Gitlab, keeping issues/milestones/metadata
-
-*Note: The project was init by  [oasiswork](oasiswork/redmine-gitlab-migrator). 
-       Was then used by @ultreia.io to migrate some pretty big projects.*
+Migrate Redmine projects to Gitlab.
 
 Enjoy.
 
-Does
-----
+## Abstract
+
+### Does
 
 - Per-project migrations
 - Migration of issues, keeping as much metadata as possible:
@@ -30,8 +27,7 @@ Does
   - issues composing the version
   - statuses & due dates
 
-Does not
---------
+### Does not
 
 - Migrate users, groups, and permissions (redmine ACL model is complex and
   cannot be transposed 1-1 to gitlab ACL)
@@ -49,8 +45,7 @@ Does not
 - Migrate tags ([redmine_tags](https://www.redmine.org/plugins/redmine_tags)
   plugin), as they are not exposed in gitlab API
 
-Requires
---------
+### Requires
 
 - Python >= 3.4
 - gitlab >= 7.0
@@ -60,11 +55,10 @@ Requires
 - No preexisting issues on gitlab project
 - Already synced users (those required in the project you are migrating)
 
-(It was developed/tested around redmine 2.5.2, gitlab 8.2.0, python 3.4)
+(It was developed/tested around redmine 3.3, gitlab 8.2.0, python 3.4)
 
 
-Let's go
---------
+# Install
 
 You can or can not use
 [virtualenvs](http://docs.python-guide.org/en/latest/dev/virtualenvs/), that's
@@ -72,77 +66,115 @@ up to you.
 
 Install it:
 
-    pip install redmine-gitlab-migrate
+    pip install migrate-redmine-to-gitlab
 
 
 (or if you cloned the git: `python setup.py install`)
 
-    migrate-rg --help
+    migrate-redmine-to-gitlab --help
 
-Migration process
------------------
+# Migrate a project
 
 This process is for each project, **order matters**.
 
-### Create the gitlab project
+For the example we will migrate project observe from [https://forge.codelutin.com/projects/observe][Code Lutin Redmine] to
+[https://gitlab.com/ultreia.io/ird-observe](Ultreia.io Gitlab).
 
-It doesn't neet to be named the same, you just have to record it's URL (eg:
-*https://git.example.com/mygroup/myproject*).
+## Create the gitlab project
 
-### Create users
+It does not need to be named the same, you just have to record it's URL.
 
-Manual operation, project members in gitlab need to have the same username as
-members in redmine. Every member that interacted with the redmine project
-should be added to the gitlab project.
-If a corresponding user can't be found in gitlab, the issue/comment will be
+Add users to your project (we will se later how to map redmine users to them).
+
+Note that if a redmine user can't be found in gitlab, the issue/comment will be
 assigned to the gitlab admin user.
 
+Import git repository.
 
-### Download redmine data
+Important note: **The project must have NO milestone and NO issue.**
 
-Download all redmine data once for all
+## Init migration
 
-    migrate-rg download-redmine --redmine-key xxxx --cache-dir xxxx \
-      https://redmine.example.com/projects/myproject
+Create a directory, go in it.
 
-### Migrate Roadmap
+``
+mkdir observe
+cd observe
+``
 
-If you do use roadmaps, redmine *versions* will be converted to gitlab
-*milestones*. If you don't, just skip this step.
+Create a **config.json** file with this content _(adapt content with your credentials)_:
+ 
+ ```
+ {
+  "redmine": { "url":"https://forge.codelutin.com/projects/observe", "key": "XXX" },
+  "gitlab": { "url":"https://gitlab.com/ultreia.io/ird-observe", "key": "XXX" }  
+}
+ ```
 
-    migrate-rg roadmap --redmine-key xxxx --cache-dir xxx --gitlab-key xxxx \
-      https://redmine.example.com/projects/myproject \
-      http://git.example.com/mygroup/myproject --check
+Launch command
+
+``
+python3 migrate-redmine-to-gitlab init
+``
+
+This will download all the redmine project stuff in direcytoy **redmine**
+
+You should have then a such directory layout:
+
+```
+observe
+├── config.json
+└── redmine
+    ├── attachments
+    ├── issues
+    ├── project.json
+    ├── users
+    └── versions
+```
+
+## Adapt users
+
+The directory **redmine/users** contains all users from the Redmine project. 
+
+To match a gitlab user, you need to set the login attribute in each file to the gitlab login.
+
+Note that you won't be able to continue migration process until all redmine users match any of one gitlab user.
+
+## Migrate Roadmap
+
+``
+python3 migrate-redmine-to-gitlab roadmap --check
+``
 
 *(remove `--check` to perform it for real, same applies for other commands)*
 
 ### Migrate Attachments
 
-This will upload all issues attachments.
-
-    migrate-rg attachments --redmine-key xxxx --cache-dir xxx --gitlab-key xxxx \
-      https://redmine.example.com/projects/myproject \
-      http://git.example.com/mygroup/myproject --check
+``
+python3 migrate-redmine-to-gitlab attachments --check
+``
 
 *(remove `--check` to perform it for real, same applies for other commands)*
 
 ### Migrate issues (without adding redmine id in title)
 
-    migrate-rg issues --redmine-key xxxx --cache-dir xxx --gitlab-key xxxx \
-      https://redmine.example.com/projects/myproject \
-      http://git.example.com/mygroup/myproject --check
+``
+python3 migrate-redmine-to-gitlab issues --check
+``
+
+*(remove `--check` to perform it for real, same applies for other commands)*
 
 ### Migrate issues (with adding redmine id in title)
 
-    migrate-rg issues-with-id --redmine-key xxxx --cache-dir xxx --gitlab-key xxxx \
-      https://redmine.example.com/projects/myproject \
-      http://git.example.com/mygroup/myproject --check
+``
+python3 migrate-redmine-to-gitlab issues-with-id --check
+``
+
+*(remove `--check` to perform it for real, same applies for other commands)*
 
 Note that your issue titles will be annotated with the original redmine issue
 ID, like *-RM-1186-MR-logging*. This annotation will be used (and removed) by
 the next step.
-
-*(remove `--check` to perform it for real, same applies for other commands)*
 
 ### Migrate Issues ID (iid) (optional)
 
@@ -150,37 +182,16 @@ You can retain the issues ID from redmine, **this cannot be done via REST
 API**, thus it requires **direct access to the gitlab machine**.
 
 So you have to log in the gitlab machine (eg. via SSH), and then issue the
-commad with sufficient rights, from there:
+command with sufficient rights, from there:
 
-    migrate-rg iid --redmine --redmine-key xxxx --gitlab-key xxxx \
-      https://redmine.example.com/projects/myproject \
-      http://git.example.com/mygroup/myproject --check
+``
+python3 migrate-redmine-to-gitlab iid --check
+``
 
 *(remove `--check` to perform it for real, same applies for other commands)*
 
 ### Delete all issues of a project
 
-    migrate-rg delete-issues --gitlab-key xxxx \
-      http://git.example.com/mygroup/myproject
-
-### Import git repository
-
-A bare matter of `git remote set-url && git push`, see git documentation.
-
-Note that gitlab does not support multiple repositories per project, you'll have
-to reorganize your projects if you were using that feature of Redmine.
-
-### Archive redmine project
-
-If you want to.
-
-You're good to go :).
-
-Unit testing
-------------
-
-Use the standard way:
-
-    python setup.py test
-
-Or use whatever test runner you fancy.
+``
+python3 migrate-redmine-to-gitlab delete-issues
+``
