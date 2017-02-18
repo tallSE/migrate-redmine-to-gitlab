@@ -151,7 +151,7 @@ python3 migrate-redmine-to-gitlab roadmap --check
 
 *(remove `--check` to perform it for real)*
 
-### Migrate Attachments
+## Migrate Attachments
 
 ``
 python3 migrate-redmine-to-gitlab attachments --check
@@ -159,7 +159,7 @@ python3 migrate-redmine-to-gitlab attachments --check
 
 *(remove `--check` to perform it for real)*
 
-### Migrate issues (without adding redmine id in title)
+## Migrate issues (without adding redmine id in title)
 
 ``
 python3 migrate-redmine-to-gitlab issues --check
@@ -167,7 +167,7 @@ python3 migrate-redmine-to-gitlab issues --check
 
 *(remove `--check` to perform it for real)*
 
-### Migrate issues (with adding redmine id in title)
+## Migrate issues (with adding redmine id in title)
 
 ``
 python3 migrate-redmine-to-gitlab issues-with-id --check
@@ -179,7 +179,7 @@ Note that your issue titles will be annotated with the original redmine issue
 ID, like *-RM-1186-MR-logging*. This annotation will be used (and removed) by
 the next step.
 
-### Migrate Issues ID (iid) (optional)
+## Migrate Issues ID (iid) (optional)
 
 You can retain the issues ID from redmine, **this cannot be done via REST
 API**, thus it requires **direct access to the gitlab machine**.
@@ -193,7 +193,20 @@ python3 migrate-redmine-to-gitlab iid --check
 
 *(remove `--check` to perform it for real)*
 
-### Delete all issues of a project
+## After all
+
+Once all this steps has been performed, the project is fully loaded in GitLab.
+
+Note that redmine caches files has been linked to the GitLab resources; this means that we can now perform operations 
+from both applications.
+
+I intend to add a last command to send to redmine a note on each version and issue with his migrated url on GitLab.
+
+Should be done soon...
+
+## Delete all issues of a project
+
+An extra command I develop while testing issues imports. You should not use this command.
 
 ``
 python3 migrate-redmine-to-gitlab delete-issues

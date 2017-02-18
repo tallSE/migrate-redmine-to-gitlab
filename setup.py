@@ -1,7 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from __future__ import unicode_literals
 
 import os
+
 from setuptools import setup
 
 try:
@@ -12,12 +13,12 @@ except IOError:
 setup(
     name='migrate-redmine-to-gitlab',
     version='1.0.0',
-    description='Migrate a redmine project to gitlab',
+    description='Migrate a redmine project to Gitlab',
     long_description=README,
     author='Tony Chemit',
     author_email='dev@tchemit.fr',
     license='GPL',
-    url='https://github/ultreia-io/redmine-to-gitlab-migrator/',
+    url='https://github/ultreia-io/migrate-redmine-to-gitlab',
     packages=['migrate_redmine_to_gitlab'],
     install_requires=['requests'],
     entry_points={
