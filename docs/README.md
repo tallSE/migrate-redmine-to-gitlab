@@ -1,4 +1,4 @@
-# Redmine to Gitlab migrator
+# Migrate from Redmine to Gitlab
 
 [![Build Status](https://travis-ci.org/ultreia-io/migrate-redmine-to-gitlab.svg?branch=master)](https://travis-ci.org/ultreia-io/migrate-redmine-to-gitlab) [![PyPI version](https://badge.fury.io/py/migrate-redmine-to-gitlab.svg)](https://badge.fury.io/py/migrate-redmine-to-gitlab)
 
@@ -31,9 +31,7 @@ Enjoy.
   cannot be transposed 1-1 to gitlab ACL)
 - Migrate repositories (piece of cake to do by hand, + redmine allows multiple
   repositories per project where gitlab does not)
-- Migrate wikis (because we don't use them at @oasiswork, feel free to contribute)
-- Migrate the whole redmine installation at once, because namespacing is different in
-  redmine and gitlab
+- Migrate wiki
 - Archive the redmine project for you
 - Keep creation/edit dates as metadata
 - Keep "watchers" on tickets (gitlab API v3 does not expose it)
@@ -120,7 +118,7 @@ Launch command
 python3 migrate-redmine-to-gitlab init
 ```
 
-This will download all the redmine project stuff in direcytoy **redmine**
+This will download all the redmine project stuff in directory **redmine**
 
 You should have then a such directory layout:
 
