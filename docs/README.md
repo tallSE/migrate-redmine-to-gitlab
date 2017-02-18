@@ -1,14 +1,12 @@
 # Redmine to Gitlab migrator
 
-[![Build Status](https://travis-ci.org/ultreia-io/migrate-redmine-to-gitlab.svg?branch=master)](https://travis-ci.org/ultreia-io/migrate-redmine-to-gitlab) [![PyPI version](https://badge.fury.io/py/redmine-gitlab-migrate.svg)](https://badge.fury.io/py/migrate-redmine-to-gitlab)
+[![Build Status](https://travis-ci.org/ultreia-io/migrate-redmine-to-gitlab.svg?branch=master)](https://travis-ci.org/ultreia-io/migrate-redmine-to-gitlab) [![PyPI version](https://badge.fury.io/py/migrate-redmine-to-gitlab.svg)](https://badge.fury.io/py/migrate-redmine-to-gitlab)
 
 Migrate Redmine projects to Gitlab.
 
 Enjoy.
 
-## Abstract
-
-### Does
+## Does
 
 - Per-project migrations
 - Migration of issues, keeping as much metadata as possible:
@@ -27,7 +25,7 @@ Enjoy.
   - issues composing the version
   - statuses & due dates
 
-### Does not
+## Does not
 
 - Migrate users, groups, and permissions (redmine ACL model is complex and
   cannot be transposed 1-1 to gitlab ACL)
@@ -45,7 +43,7 @@ Enjoy.
 - Migrate tags ([redmine_tags](https://www.redmine.org/plugins/redmine_tags)
   plugin), as they are not exposed in gitlab API
 
-### Requires
+## Requires
 
 - Python >= 3.4
 - gitlab >= 7.0
@@ -56,6 +54,11 @@ Enjoy.
 - Already synced users (those required in the project you are migrating)
 
 (It was developed/tested around redmine 3.3, gitlab 8.2.0, python 3.4)
+
+## Credits
+
+Many thanks to the @oasiswork team for the good work they have done with the project 
+https://github.com/oasiswork/redmine-gitlab-migrator on which this project is based on.
 
 
 # Install
@@ -77,8 +80,8 @@ Install it:
 
 This process is for each project, **order matters**.
 
-For the example we will migrate project observe from [https://forge.codelutin.com/projects/observe][Code Lutin Redmine] to
-[https://gitlab.com/ultreia.io/ird-observe](Ultreia.io Gitlab).
+For the example we will migrate project observe from [Code Lutin Redmine](https://forge.codelutin.com/projects/observe) to
+[Ultreia.io Gitlab](https://gitlab.com/ultreia.io/ird-observe).
 
 ## Create the gitlab project
 
@@ -146,7 +149,7 @@ Note that you won't be able to continue migration process until all redmine user
 python3 migrate-redmine-to-gitlab roadmap --check
 ``
 
-*(remove `--check` to perform it for real, same applies for other commands)*
+*(remove `--check` to perform it for real)*
 
 ### Migrate Attachments
 
@@ -154,7 +157,7 @@ python3 migrate-redmine-to-gitlab roadmap --check
 python3 migrate-redmine-to-gitlab attachments --check
 ``
 
-*(remove `--check` to perform it for real, same applies for other commands)*
+*(remove `--check` to perform it for real)*
 
 ### Migrate issues (without adding redmine id in title)
 
@@ -162,7 +165,7 @@ python3 migrate-redmine-to-gitlab attachments --check
 python3 migrate-redmine-to-gitlab issues --check
 ``
 
-*(remove `--check` to perform it for real, same applies for other commands)*
+*(remove `--check` to perform it for real)*
 
 ### Migrate issues (with adding redmine id in title)
 
@@ -170,7 +173,7 @@ python3 migrate-redmine-to-gitlab issues --check
 python3 migrate-redmine-to-gitlab issues-with-id --check
 ``
 
-*(remove `--check` to perform it for real, same applies for other commands)*
+*(remove `--check` to perform it for real)*
 
 Note that your issue titles will be annotated with the original redmine issue
 ID, like *-RM-1186-MR-logging*. This annotation will be used (and removed) by
@@ -188,7 +191,7 @@ command with sufficient rights, from there:
 python3 migrate-redmine-to-gitlab iid --check
 ``
 
-*(remove `--check` to perform it for real, same applies for other commands)*
+*(remove `--check` to perform it for real)*
 
 ### Delete all issues of a project
 
