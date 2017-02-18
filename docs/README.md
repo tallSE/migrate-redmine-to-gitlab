@@ -57,8 +57,8 @@ Enjoy.
 
 ## Credits
 
-Many thanks to the @oasiswork team for the good work they have done with the project 
-https://github.com/oasiswork/redmine-gitlab-migrator on which this project is based on.
+Many thanks to the _@oasiswork_ team for the good work they have done with the project 
+[redmine-gitlab-migrator](https://github.com/oasiswork/redmine-gitlab-migrator) on which this project is based on.
 
 
 # Install
@@ -100,10 +100,10 @@ Important note: **The project must have NO milestone and NO issue.**
 
 Create a directory, go in it.
 
-``
+```
 mkdir observe
 cd observe
-``
+```
 
 Create a **config.json** file with this content _(adapt content with your credentials)_:
  
