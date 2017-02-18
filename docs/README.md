@@ -116,9 +116,9 @@ Create a **config.json** file with this content _(adapt content with your creden
 
 Launch command
 
-``
+```
 python3 migrate-redmine-to-gitlab init
-``
+```
 
 This will download all the redmine project stuff in direcytoy **redmine**
 
@@ -145,33 +145,33 @@ Note that you won't be able to continue migration process until all redmine user
 
 ## Migrate Roadmap
 
-``
+```
 python3 migrate-redmine-to-gitlab roadmap --check
-``
+```
 
 *(remove `--check` to perform it for real)*
 
 ## Migrate Attachments
 
-``
+```
 python3 migrate-redmine-to-gitlab attachments --check
-``
+```
 
 *(remove `--check` to perform it for real)*
 
 ## Migrate issues (without adding redmine id in title)
 
-``
+```
 python3 migrate-redmine-to-gitlab issues --check
-``
+```
 
 *(remove `--check` to perform it for real)*
 
 ## Migrate issues (with adding redmine id in title)
 
-``
+```
 python3 migrate-redmine-to-gitlab issues-with-id --check
-``
+```
 
 *(remove `--check` to perform it for real)*
 
@@ -187,9 +187,9 @@ API**, thus it requires **direct access to the gitlab machine**.
 So you have to log in the gitlab machine (eg. via SSH), and then issue the
 command with sufficient rights, from there:
 
-``
+```
 python3 migrate-redmine-to-gitlab iid --check
-``
+```
 
 *(remove `--check` to perform it for real)*
 
@@ -208,6 +208,6 @@ Should be done soon...
 
 An extra command I develop while testing issues imports. You should not use this command.
 
-``
+```
 python3 migrate-redmine-to-gitlab delete-issues
-``
+```
