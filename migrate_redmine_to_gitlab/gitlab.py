@@ -132,8 +132,13 @@ class GitlabProject(Project):
     def get_milestones(self):
         if not hasattr(self, '_cache_milestones'):
             # noinspection PyAttributeOutsideInit
-            self._cache_milestones = self.api.get(
-                '{}/milestones'.format(self.api_url))
+            self._cache_milestones= []
+            page = 1
+            found_issues = self.api.get('{}/milestones?page={}&per_page=100'.format(self.api_url, page))
+            while len(found_issues) > 0:
+                self._cache_milestones += found_issues
+                page += 1
+                found_issues = self.api.get('{}/milestones?page={}&per_page=100'.format(self.api_url, page))
         return self._cache_milestones
 
     def get_milestones_index(self):
