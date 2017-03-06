@@ -156,7 +156,7 @@ class Versions(Command):
         self.cache = self.redmine_cache(self.redmine)
 
         checks = [
-            (self.check_no_milestone, 'Gitlab project has no pre-existing milestone'),
+            # (self.check_no_milestone, 'Gitlab project has no pre-existing milestone'),
             (self.check_origin_milestone, 'Redmine project contains versions'),
         ]
         for i in checks:
@@ -167,19 +167,24 @@ class Versions(Command):
 
     def execute(self):
 
+        existing_gitlab_versions = self.gitlab.get_milestones_index().keys()
+
         versions_data = [convert_version(redmine_version) for redmine_version in self.redmine_versions]
         if self.args.check:
             for data, meta in versions_data:
-                log.info("Would create version {}".format(data))
-            pass
+                if not data['title'] in existing_gitlab_versions:
+                    log.info("Would create version {}".format(data))
+            return
 
         gitlab_versions = []
-        created_versions, bad_versions = self._create_versions(versions_data, [])
+        created_versions, bad_versions = self._create_versions(versions_data, [], existing_gitlab_versions)
         gitlab_versions += created_versions
         while len(bad_versions) > 0:
             log.info('Some versions were not created: {}'.format(bad_versions))
 
-            created_versions, bad_versions = self._create_versions(versions_data, bad_versions)
+            created_versions, bad_versions = self._create_versions(versions_data,
+                                                                   bad_versions,
+                                                                   existing_gitlab_versions)
             gitlab_versions += created_versions
 
         versions_index = {str(redmine_version['id']): redmine_version for redmine_version in self.redmine_versions}
@@ -202,10 +207,13 @@ class Versions(Command):
     def check_no_milestone(redmine, gitlab):
         return len(gitlab.get_milestones()) == 0
 
-    def _create_versions(self, versions_data, incoming_bad_versions):
+    def _create_versions(self, versions_data, incoming_bad_versions, existing_gitlab_versions):
         bad_versions = []
         created_versions = []
         for data, meta in versions_data:
+            if data['title'] in existing_gitlab_versions:
+                log.info("skip existing milestone {}".format(data['title']))
+                pass
             log.debug(data)
             data_id = str(data['redmine_id'])
             if len(incoming_bad_versions) == 0 or data_id in incoming_bad_versions:
