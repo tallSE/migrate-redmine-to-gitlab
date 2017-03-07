@@ -212,17 +212,6 @@ migrate-redmine-to-gitlab link-issues --check
 
 *(remove `--check` to perform it for real)*
 
-## After all
-
-Once all this steps has been performed, the project is fully loaded in GitLab.
-
-Note that redmine caches files has been linked to the GitLab resources; this means that we can now perform operations 
-from both applications.
-
-I intend to add a last command to send to redmine a note on each version and issue with his migrated url on GitLab.
-
-Should be done soon...
-
 ## Delete all issues of a project
 
 An extra command I develop while testing issues imports. You should not use this command.
