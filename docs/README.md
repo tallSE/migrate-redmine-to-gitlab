@@ -46,6 +46,7 @@ Enjoy.
 - Python >= 3.4
 - gitlab >= 7.0
 - redmine >= 1.3
+- curl
 - Admin token on redmine
 - Admin token on gitlab
 - No preexisting issues on gitlab project
@@ -187,6 +188,26 @@ command with sufficient rights, from there:
 
 ```
 migrate-redmine-to-gitlab iid --check
+```
+
+*(remove `--check` to perform it for real)*
+
+## Link redmine versions to gitlab milestones
+
+Will set the description of the redmine version with a link to the gitlab milestone.
+
+```
+migrate-redmine-to-gitlab link-roadmap --check
+```
+
+*(remove `--check` to perform it for real)*
+
+## Link redmine issues to gitlab milestones
+
+Will add a note to the redmine issue with a link to the gitlab milestone.
+
+```
+migrate-redmine-to-gitlab link-issues --check
 ```
 
 *(remove `--check` to perform it for real)*
