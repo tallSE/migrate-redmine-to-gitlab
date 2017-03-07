@@ -35,6 +35,7 @@ class GitlabProject(Project):
         self.api_url0 = ('{base_url}api/v3/projects/{namespace}%2F{project_name}'.format(**self._url_match.groupdict()))
         self.project = self.get_project()
         self.project_id = str(self.project['id'])
+        self.project_url = '{base_url}{namespace}/{project_name}'.format(**self._url_match.groupdict())
         log.info('Go gitlab project {}'.format(self.project_id))
         self.api_url = (('{base_url}api/v3/projects/' + self.project_id).format(**self._url_match.groupdict()))
         self.instance_url = '{}/api/v3'.format(self._url_match.group('base_url'))
@@ -132,7 +133,7 @@ class GitlabProject(Project):
     def get_milestones(self):
         if not hasattr(self, '_cache_milestones'):
             # noinspection PyAttributeOutsideInit
-            self._cache_milestones= []
+            self._cache_milestones = []
             page = 1
             found_issues = self.api.get('{}/milestones?page={}&per_page=100'.format(self.api_url, page))
             while len(found_issues) > 0:

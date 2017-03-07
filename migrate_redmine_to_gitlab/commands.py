@@ -3,6 +3,8 @@ import argparse
 import logging
 import re
 
+import subprocess
+
 from migrate_redmine_to_gitlab import sql
 from migrate_redmine_to_gitlab.config import MigrationConfig
 from migrate_redmine_to_gitlab.converters import convert_issue, convert_version, convert_attachments
@@ -52,6 +54,14 @@ def parse_args():
     delete_issues = subparsers.add_parser('delete-issues', help=DeleteIssues.__doc__)
     delete_issues.set_defaults(command=DeleteIssues)
     commands.append(delete_issues)
+
+    link_roadmap = subparsers.add_parser('link-roadmap', help=LinkRedmineRoadmap.__doc__)
+    link_roadmap.set_defaults(command=LinkRedmineRoadmap)
+    commands.append(link_roadmap)
+
+    link_issue = subparsers.add_parser('link-issues', help=LinkRedmineIssue.__doc__)
+    link_issue.set_defaults(command=LinkRedmineIssue)
+    commands.append(link_issue)
 
     iid = subparsers.add_parser('iid', help=Iid.__doc__)
     iid.set_defaults(command=Iid)
@@ -156,7 +166,7 @@ class Versions(Command):
         self.cache = self.redmine_cache(self.redmine)
 
         checks = [
-            # (self.check_no_milestone, 'Gitlab project has no pre-existing milestone'),
+            (self.check_no_milestone, 'Gitlab project has no pre-existing milestone'),
             (self.check_origin_milestone, 'Redmine project contains versions'),
         ]
         for i in checks:
@@ -363,9 +373,8 @@ class Issues(Command):
         for gitlab_issue in gitlab_issues:
             redmine_id = gitlab_issue['redmine_id']
             redmine_issue = issues_by_index[redmine_id]
-            redmine_issue['gitlab_id'] = gitlab_issue['id']
+            redmine_issue['gitlab_id'] = gitlab_issue['iid']
             self.cache.load_issue(redmine_issue)
-
         log.info('{} issue(s) created on GitLab'.format(len(gitlab_issues)))
 
     def _convert_issues(self):
@@ -487,6 +496,98 @@ class DeleteIssues(Command):
     def execute(self):
         log.info('Start {}'.format(self))
 
-        for issue in self.gitlab.get_issues():
+        gitlab_issues = self.gitlab.get_issues()
+        log.info('Got {} issue(s) from gitlab.'.format(len(gitlab_issues)))
+
+        for issue in gitlab_issues:
             log.info('delete issue {}'.format(issue['id']))
             self.gitlab.delete_issue(issue['id'])
+
+
+class LinkRedmineRoadmap(Command):
+    def __init__(self, config, args):
+        # noinspection PyCompatibility
+        super().__init__(config, args)
+        self.redmine = self.redmine_project_with_cache()
+        self.gitlab = self.gitlab_project()
+        self.cache = self.redmine_cache(self.redmine)
+
+    def execute(self):
+        log.info('Start {}'.format(self))
+
+        redmine_versions = self.redmine.get_versions()
+        log.info('Got {} version(s) from redmine.'.format(len(redmine_versions)))
+
+        gitlab_milestones = self.gitlab.get_milestones()
+        log.info('Got {} milestone(s) from gitlab.'.format(len(gitlab_milestones)))
+        gitlab_milestones_index = {i['title']: i for i in gitlab_milestones}
+
+        for redmine_version in redmine_versions:
+
+            name = redmine_version['name']
+            gitlab_milestone = gitlab_milestones_index[name]
+            log.debug(gitlab_milestone)
+            gitlab_milestone_iid = gitlab_milestone['iid']
+            self.redmine.link_roadmap(redmine_version, gitlab_milestone_iid, self.gitlab.project_url, self.cache)
+
+            redmine_version_id = redmine_version['id']
+            json_file_path = self.cache.get_version2_path(redmine_version_id)
+
+            action = ['curl', '-v', '-X', 'PUT',
+                      '-H', 'Content-Type: application/json',
+                      '-H', 'X-Redmine-API-Key:{}'.format(self.config.redmine_key),
+                      '--data-binary', '@{}'.format(json_file_path),
+                      '{}/versions/{}.json'.format(self.config.redmine_host, redmine_version_id)]
+            if self.args.check:
+                log.info(
+                    'Would link redmine version {} ({}) to gitlab milestone {}'.format(redmine_version_id, name,
+                                                                                       gitlab_milestone_iid))
+                log.info('using command: {}'.format(action))
+            else:
+                log.info('Link redmine version {} ({}) to gitlab milestone {}'.format(redmine_version_id, name,
+                                                                                      gitlab_milestone_iid))
+                log.debug('using command: {}'.format(action))
+                subprocess.run(action, stdout=subprocess.PIPE)
+
+
+class LinkRedmineIssue(Command):
+    def __init__(self, config, args):
+        # noinspection PyCompatibility
+        super().__init__(config, args)
+        self.redmine = self.redmine_project_with_cache()
+        self.gitlab = self.gitlab_project()
+        self.cache = self.redmine_cache(self.redmine)
+
+    def execute(self):
+        log.info('Start {}'.format(self))
+
+        redmine_issues = self.redmine.get_all_issues()
+
+        log.info('Got {} issue(s) from redmine.'.format(len(redmine_issues)))
+
+        gitlab_issues = self.gitlab.get_issues()
+        gitlab_issues_index = {i['title']: i for i in gitlab_issues}
+
+        log.info('Got {} issue(s) from gitlab.'.format(len(gitlab_issues)))
+
+        for redmine_issue in redmine_issues:
+            subject = redmine_issue['subject'].strip()
+            gitlab_issue = gitlab_issues_index[subject]
+            redmine_issue_id = redmine_issue['id']
+            self.redmine.link_issue(redmine_issue, gitlab_issue['iid'], self.gitlab.project_url, self.cache)
+
+            json_file_path = self.cache.get_issue2_path(redmine_issue_id)
+
+            action = ['curl', '-X', 'PUT',
+                      '-H', 'Content-Type: application/json',
+                      '-H', 'X-Redmine-API-Key:{}'.format(self.config.redmine_key),
+                      '--data-binary', '@{}'.format(json_file_path),
+                      '{}/issues/{}.json'.format(self.config.redmine_host, redmine_issue_id)]
+            if self.args.check:
+                log.info(
+                    'Would link redmine issue {} ({}) to {}'.format(redmine_issue_id, subject, gitlab_issue['iid']))
+                log.info('using command: {}'.format(action))
+            else:
+                log.info('Link redmine issue {} ({}) to {}'.format(redmine_issue_id, subject, gitlab_issue['iid']))
+                log.debug('using command: {}'.format(action))
+                subprocess.run(action, shell=True, check=True)

@@ -12,7 +12,7 @@ except IOError:
 
 setup(
     name='migrate-redmine-to-gitlab',
-    version='2.0.1',
+    version='2.0.2',
     description='Migrate a redmine project to Gitlab',
     long_description=README,
     author='Tony Chemit',

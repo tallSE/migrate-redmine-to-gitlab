@@ -27,7 +27,9 @@ def convert_notes(redmine_issue_journals, redmine_user_index):
 
     for entry in redmine_issue_journals:
         journal_notes = entry.get('notes', '')
-        if len(journal_notes) > 0:
+        if not 'Migrated to https' in journal_notes \
+                and not 'Moved to https' in journal_notes \
+                and len(journal_notes) > 0:
             body = "{}\n\n*(from redmine: written on {})*".format(
                 journal_notes, entry['created_on'][:10])
             try:

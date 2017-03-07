@@ -156,6 +156,8 @@ class RedmineProjectWithCache(Project):
     def __init__(self, url, cache_dir, *args, **kwargs):
         # noinspection PyCompatibility
         super().__init__(url, *args, **kwargs)
+        self.api_url = '{}.json'.format(self.public_url)
+        self.instance_url = self._url_match.group('base_url')
         self.path = cache_dir
         with open(os.path.join(self.path, 'project.json'), 'r') as outfile:
             self.project = json.load(outfile)
@@ -186,6 +188,15 @@ class RedmineProjectWithCache(Project):
 
     def get_attachments_index(self):
         return {i['id']: i for i in self.get_attachments()}
+
+    def link_roadmap(self, version, gitlab_id, gitlab_url, cache):
+        if not '/milestones/' in version['description']:
+            version['description'] += "Moved to {}/milestones/{}".format(gitlab_url, gitlab_id)
+        cache.load_version2(version)
+
+    def link_issue(self, issue, gitlab_id, gitlab_url, cache):
+        issue['note'] = "Moved to {}/issues/{}".format(gitlab_url, gitlab_id)
+        cache.load_issue2(issue)
 
     @staticmethod
     def _load_data(path):
@@ -278,6 +289,33 @@ class RedmineCacheWriter:
     def load_version(self, version):
         path = os.path.join(self.path, 'versions')
         self._store_data(path, version, version['id'], 'Version')
+
+    def load_version2(self, version):
+        path = os.path.join(self.path, 'versions2')
+        self._create_dir(path)
+        v = {
+            "version": {
+                "name": version['name'],
+                "description": version['description']
+            }
+        }
+        self._store_data(path, v, version['id'], 'Version')
+
+    def load_issue2(self, issue):
+        path = os.path.join(self.path, 'issues2')
+        self._create_dir(path)
+        v = {
+            "issue": {
+                "notes": issue['note']
+            }
+        }
+        self._store_data(path, v, issue['id'], 'Issue')
+
+    def get_version2_path(self, version_id):
+        return os.path.join(self.path, 'versions2', '{}.json'.format(version_id))
+
+    def get_issue2_path(self, issue_id):
+        return os.path.join(self.path, 'issues2', '{}.json'.format(issue_id))
 
     @staticmethod
     def _create_dir(path):
