@@ -108,8 +108,8 @@ Create a **config.json** file with this content _(adapt content with your creden
  
  ```
  {
-  "redmine": { "url":"https://forge.codelutin.com/projects/observe", "key": "XXX" },
-  "gitlab": { "url":"https://gitlab.com/ultreia.io/ird-observe", "key": "XXX" }  
+  "redmine": { "host":"https://forge.codelutin.com", "path":"projects/observe", "key": "XXX" },
+  "gitlab": { "host":"https://gitlab.com", "path":"ultreia.io/ird-observe", "key": "XXX" }
 }
  ```
 
