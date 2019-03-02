@@ -32,13 +32,13 @@ class GitlabProject(Project):
     def __init__(self, *args, **kwargs):
         # noinspection PyCompatibility
         super().__init__(*args, **kwargs)
-        self.api_url0 = ('{base_url}api/v3/projects/{namespace}%2F{project_name}'.format(**self._url_match.groupdict()))
+        self.api_url0 = ('{base_url}api/v4/projects/{namespace}%2F{project_name}'.format(**self._url_match.groupdict()))
         self.project = self.get_project()
         self.project_id = str(self.project['id'])
         self.project_url = '{base_url}{namespace}/{project_name}'.format(**self._url_match.groupdict())
         log.info('Go gitlab project {}'.format(self.project_id))
-        self.api_url = (('{base_url}api/v3/projects/' + self.project_id).format(**self._url_match.groupdict()))
-        self.instance_url = '{}/api/v3'.format(self._url_match.group('base_url'))
+        self.api_url = (('{base_url}api/v4/projects/' + self.project_id).format(**self._url_match.groupdict()))
+        self.instance_url = '{}/api/v4'.format(self._url_match.group('base_url'))
 
     def is_repository_empty(self):
         """ Heuristic to check if repository is empty
@@ -79,8 +79,8 @@ class GitlabProject(Project):
 
         issues_url = '{}/issues'.format(self.api_url)
         issue = self.api.post(issues_url, data=data)
-
-        issue_url = '{}/{}'.format(issues_url, issue['id'])
+	#����iid��
+        issue_url = '{}/{}'.format(issues_url, issue['iid'])
 
         # Handle issues notes
         issue_notes_url = '{}/notes'.format(issue_url, 'notes')
