@@ -48,8 +48,7 @@ class RedmineClient(APIClient):
             raise ValueError('HTTP response data is not paginated')
 
         while (resp['total_count'] - resp['offset'] - resp['limit']) > 0:
-            kwargs['params']['offset'] = (kwargs['params'].get('offset', 0)
-                                          + self.PAGE_MAX_SIZE)
+            kwargs['params']['offset'] = (kwargs['params'].get('offset', 0) + self.PAGE_MAX_SIZE)
             resp = self.get(*args, **kwargs)
             result_pages.append(resp[res_list_key])
         return chain.from_iterable(result_pages)
@@ -134,6 +133,9 @@ class RedmineProject(Project):
             # The anonymous user is not really part of the project...
             if user_id != ANONYMOUS_USER_ID:
                 users.append(self.api.get('{}/users/{}.json'.format(self.instance_url, user_id)))
+            # If the user is anonymous , user_id is set ANONYMOUS_USER_ID(2019/3/3) 
+            else
+                users.append(self.api.get('{}/users/{}.json'.format(self.instance_url, ANONYMOUS_USER_ID)))
         return users
 
     def get_users_index(self):
