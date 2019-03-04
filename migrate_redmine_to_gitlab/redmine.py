@@ -134,7 +134,7 @@ class RedmineProject(Project):
             if user_id != ANONYMOUS_USER_ID:
                 users.append(self.api.get('{}/users/{}.json'.format(self.instance_url, user_id)))
             # If the user is anonymous , user_id is set ANONYMOUS_USER_ID(2019/3/3) 
-            else
+            else:
                 users.append(self.api.get('{}/users/{}.json'.format(self.instance_url, ANONYMOUS_USER_ID)))
         return users
 
