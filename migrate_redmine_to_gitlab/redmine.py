@@ -3,7 +3,7 @@ import os
 import re
 import logging
 import json
-
+from requests.exceptions import HTTPError
 from . import APIClient, Project
 
 ANONYMOUS_USER_ID = 2
@@ -132,10 +132,12 @@ class RedmineProject(Project):
         for user_id in user_ids:
             # The anonymous user is not really part of the project...
             if user_id != ANONYMOUS_USER_ID:
-                users.append(self.api.get('{}/users/{}.json'.format(self.instance_url, user_id)))
+                try:
+                    users.append(self.api.get('{}/users/{}.json'.format(self.instance_url, user_id)))
             # If the user is anonymous , user_id is set ANONYMOUS_USER_ID(2019/3/3) 
-            else:
-                users.append(self.api.get('{}/users/{}.json'.format(self.instance_url, ANONYMOUS_USER_ID)))
+                except HTTPError as e:
+                    print(e)
+                    users.append(self.api.get('{}/users/{}.json'.format(self.instance_url, ANONYMOUS_USER_ID)))
         return users
 
     def get_users_index(self):
