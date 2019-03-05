@@ -71,10 +71,10 @@ class GitlabProject(Project):
                 redmine_attachment = attachment['redmine']
                 gitlab_attachment = redmine_attachment.get('gitlab', None)
                 if gitlab_attachment is None:
-                    attachment_log += '\n  * [{}] ({})'.format(redmine_attachment['filename'],
+                    attachment_log += '\n  * [{}]({})'.format(redmine_attachment['filename'],
                                                                redmine_attachment['content_url'])
                 else:
-                    attachment_log += '\n  * [{}] ({})'.format(gitlab_attachment['alt'], gitlab_attachment['url'])
+                    attachment_log += '\n  * [{}]({})'.format(gitlab_attachment['alt'], gitlab_attachment['url'])
             data['description'] += attachment_log
 
         issues_url = '{}/issues'.format(self.api_url)
