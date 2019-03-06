@@ -71,12 +71,14 @@ def parse_args():
         i.add_argument('--check', required=False, action='store_true', default=False,
                        help="do not perform any action, just check everything is ready")
         i.add_argument('--debug', required=False, action='store_true', default=False, help="More output")
+        i.add_argument('--path', required=False, default=".", help="please set the path.")
 
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
+    print(args)
     if args.debug:
         log_level = logging.DEBUG
     else:
@@ -85,7 +87,7 @@ def main():
     # Configure global logging
     setup_module_logging('migrate_redmine_to_gitlab', level=log_level)
 
-    config = MigrationConfig()
+    config = MigrationConfig(args.path)
 
     try:
         args.command(config, args).run()

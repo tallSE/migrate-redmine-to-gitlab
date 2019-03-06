@@ -136,8 +136,7 @@ class RedmineProject(Project):
                     users.append(self.api.get('{}/users/{}.json'.format(self.instance_url, user_id)))
             # If the user is anonymous , user_id is set ANONYMOUS_USER_ID(2019/3/3) 
                 except HTTPError as e:
-                    print(e)
-                    users.append(self.api.get('{}/users/{}.json'.format(self.instance_url, ANONYMOUS_USER_ID)))
+                    continue
         return users
 
     def get_users_index(self):

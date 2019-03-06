@@ -8,11 +8,12 @@ log = logging.getLogger(__name__)
 
 
 class MigrationConfig:
-    def __init__(self):
+    def __init__(self, path):
         config_file = 'config.json'
-        if not os.path.exists(os.path.join('.', config_file)):
+        config_path = os.path.join(path, config_file)
+        if not os.path.exists(config_path):
             raise FileNotFoundError
-        with open(config_file, 'r') as outfile:
+        with open(config_path, 'r') as outfile:
             data = json.load(outfile)
         log.debug('config: {}'.format(data))
         self.redmine_host = data['redmine']['host']
@@ -21,7 +22,7 @@ class MigrationConfig:
         self.gitlab_host = data['gitlab']['host']
         self.gitlab_project_url = self.gitlab_host + '/' + data['gitlab']['path']
         self.gitlab_key = data['gitlab']['key']
-        self.cache_dir = os.path.join('.', 'redmine')
+        self.cache_dir = os.path.join(path, 'redmine')
         if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
             log.info('Create cache dir: {}'.format(self.cache_dir))

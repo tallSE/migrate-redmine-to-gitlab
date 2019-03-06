@@ -1,0 +1,495 @@
+# This file contains the syntax information for 
+# the entries to be put in any tnsnames.ora file
+# The entries in this file are need based. 
+# There are no defaults for entries in this file
+# that Sqlnet/Net3 use that need to be overridden 
+#
+# Typically you could have two tnsnames.ora files
+# in the system, one that is set for the entire system
+# and is called the system tnsnames.ora file, and a
+# second file that is used by each user locally so that
+# he can override the definitions dictated by the system
+# tnsnames.ora file.
+
+# The entries in tnsnames.ora are an alternative to using
+# the names server with the onames adapter.
+# They are a collection of aliases for the addresses that 
+# the listener(s) is(are) listening for a database or 
+# several databases.
+
+# The following is the general syntax for any entry in 
+# a tnsnames.ora file. There could be several such entries 
+# tailored to the user's needs.
+
+<alias>= [ (DESCRIPTION_LIST =  # Optional depending on whether u have 
+				# one or more descriptions
+				# If there is just one description, unnecessary ]
+	  (DESCRIPTION=
+	    [ (SDU=2048) ]	# Optional, defaults to 2048
+				# Can take values between 512 and 32K
+	    [ (ADDRESS_LIST=    # Optional depending on whether u have
+				# one or more addresses
+				# If there is just one address, unnecessary ]
+	      (ADDRESS=
+		[ (COMMUNITY=<community_name>) ] 
+		(PROTOCOL=tcp)
+		(HOST=<hostname>)
+		(PORT=<portnumber (1521 is a standard port used)>)
+	      )
+	      [ (ADDRESS=
+		  (PROTOCOL=ipc)
+		  (KEY=<ipckey (PNPKEY is a standard key used)>)	
+		)
+	      ]
+	      [ (ADDRESS=
+		  [ (COMMUNITY=<community_name>) ]
+		  (PROTOCOL=decnet)
+		  (NODE=<nodename>)
+		  (OBJECT=<objectname>)
+		)
+	      ]
+              ... # More addresses
+	    [ ) ] # Optional depending on whether ADDRESS_LIST is used or not 
+	    [ (CONNECT_DATA=
+		(SID=<oracle_sid>)
+		[ (GLOBAL_NAME=<global_database_name>) ]
+	      )
+	    ]
+	    [ (SOURCE_ROUTE=yes) ]  
+	  )
+	  (DESCRIPTION=     
+	    [ (SDU=2048) ]	# Optional, defaults to 2048
+				# Can take values between 512 and 32K
+	    [ (ADDRESS_LIST= ]	# Optional depending on whether u have more
+				# than one address or not
+				# If there is just one address, unnecessary
+	      (ADDRESS
+		[ (COMMUNITY=<community_name>) ]
+		(PROTOCOL=tcp)
+		(HOST=<hostname>)
+		(PORT=<portnumber (1521 is a standard port used)>)
+	      )
+	      [ (ADDRESS=
+		  (PROTOCOL=ipc)
+		  (KEY=<ipckey (PNPKEY is a standard key used)>)
+	         )
+	      ]
+	      ... 		# More addresses
+	    [ ) ] 		# Optional depending on whether ADDRESS_LIST  
+				# is being used
+	    [ (CONNECT_DATA=
+		(SID=<oracle_sid>)
+		[ (GLOBAL_NAME=<global_database_name>) ]
+	      )
+	    ]
+	    [ (SOURCE_ROUTE=yes) ]
+	  )
+	  [ (CONNECT_DATA=
+	      (SID=<oracle_sid>)
+	      [ (GLOBAL_NAME=<global_database_name>) ]
+	    )
+	  ]
+	  ...   # More descriptions 
+	[ ) ]	# Optional depending on whether DESCRIPTION_LIST is used or not
+
+RCHDBU06.RICH.DIRECT.JP =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.1.80)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdbu06.rich.direct.jp)
+    )
+  )
+TSTDBA02 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.1.67)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = tstdba02.rich.direct.jp)
+    )
+  )
+
+RCHCDA01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.1.207)(PORT = 1521))
+#      (ADDRESS = (PROTOCOL = TCP)(HOST = 52.69.210.20)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchcda01.rich.direct.jp)
+    )
+  )
+
+RCHCDA01_DR_TEST =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.1.199)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchcda01.rich.direct.jp)
+    )
+  )
+
+RCHCDA02 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.1.104)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchcda01.rich.direct.jp)
+    )
+  )
+RCHDBA01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.1.182)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdba01.rich.direct.jp)
+    )
+  )
+RCHDBA00 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = rchdba00.cpw5zjpcsbbh.ap-northeast-1.rds.amazonaws.com)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdba00)
+    )
+  )
+RCHDBA11 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = rchdba11.cpw5zjpcsbbh.ap-northeast-1.rds.amazonaws.com)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdba11)
+    )
+  )
+  
+RCHDBU01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.1.4)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdbu01.rich.direct.jp)
+    )
+  )
+
+RCHDBU02 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.8.61)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdbu02.rich.direct.jp)
+    )
+  )
+
+RCHDBU03 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.1.23)(PORT = 1621))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdbu03.rich.direct.jp)
+    )
+  )
+
+RCHDBU04 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.8.40)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdbu04.rich.direct.jp)
+    )
+  )
+
+RCHDBU05 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.1.61)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdbu05.rich.direct.jp)
+    )
+  )
+
+RCHDBU06 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.1.80)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdbu06.rich.direct.jp)
+    )
+  )
+
+RCHDBU08 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.1.66)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdbu08.rich.direct.jp)
+    )
+  )
+
+RCHDBP01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.100.31)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdbp01.rich.direct.jp)
+    )
+  )
+
+RCHDBP05 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.239.3.1)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdbp05.rich.direct.jp)
+    )
+  )
+NSNDBO01_SEINOU =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.9.2)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = nsndbo01.ns.direct.jp)
+    )
+  )
+
+NSNDBT01_SEINOU =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.9.66)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = nsndbt01.ns.direct.jp)
+    )
+  )
+
+OSNDBP01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.122.17)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = osndbp01.rich.direct.jp)
+    )
+  )
+OMSDBP01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 210.224.145.201)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdbu01.rich.direct.jp)
+    )
+  )
+
+SBIDBU01 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.1.21)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = sbidbu01.rich.direct.jp)
+    )
+  )
+
+SBIDBU02 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.1.136)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = sbidbu01.rich.direct.jp)
+    )
+  )
+
+SBIDBU02_1 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.1.22)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = sbidbu01.rich.direct.jp)
+    )
+  )
+
+RICHRDS01 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = oracleinstance.cpw5zjpcsbbh.ap-northeast-1.rds.amazonaws.com)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SID = ORACLE)
+    )
+  )
+  
+DUMMYOMS =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.1.200)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SID = sbidbu01)
+    )
+  )
+  
+LOCALDB =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = orcl.174.200.147)
+    )
+  )
+
+RCHDBT01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.10.23)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdbt01.rich.direct.jp)
+    )
+  )
+
+RCHCDC01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.250.10.5)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchcdc01.rich.direct.jp)
+    )
+  )
+
+
+RCHCDA01_DEMO =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 52.197.9.232)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchcda01.rich.direct.jp)
+    )
+  )
+RCHDBA01_DEMO =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 52.198.15.215)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = rchdba01.rich.direct.jp)
+    )
+  )
+NSNCDA01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.13.21)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = nsncda01.rich.direct.jp)
+    )
+  )
+NSNDBA01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.11.21)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = nsndba01.rich.direct.jp)
+    )
+  )
+NSNDBA02 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.11.31)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = nsndba02.rich.direct.jp)
+    )
+  )
+NSNDBA03 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.10.21)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = nsndba03.rich.direct.jp)
+    )
+  )
+TSTDBA01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.1.220)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = tstdba01.rich.direct.jp)
+    )
+  )
+TSTDBA02 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.1.67)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = tstdba02.rich.direct.jp)
+    )
+  )
+NSNDBA08 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.12.23)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = nsndba.rich.direct.jp)
+    )
+  )
+NSNDBA10 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.0.12.27)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = nsndba12.rich.direct.jp)
+    )
+  )
+  
+NSNDBO01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.241.121.130)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = nsndbo01.ns.direct.jp)
+    )
+  )
+  
+NSNDBU01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.241.113.1)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = nsndbu01.ns.direct.jp)
+    )
+  )
+
+NSNTDU01 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.241.113.131)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = nsntdu01.ns.direct.jp)
+    )
+  )
+

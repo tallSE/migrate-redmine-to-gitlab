@@ -1,0 +1,4 @@
+{
+  "redmine": { "host":"https://project.rich-security.jp", "path":"projects/gitlab", "key": "eb9e461d7f686560154f129131dd7a96c399e553"},
+  "gitlab": { "host":"https://gitlab.rich-security.jp", "path":"YukiKoyamatsu/redmine_gitlab_test", "key": "3Zs6kvT-xxyBESDW29Fz" }
+}

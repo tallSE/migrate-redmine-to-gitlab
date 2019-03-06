@@ -91,6 +91,10 @@ def convert_issue(redmine_issue,
         title = redmine_issue['subject']
 
     labels = 'From Redmine, ' + redmine_issue['tracker']['name'] + ', ' + redmine_issue['priority']['name']
+    
+    #作成日時と有効期限追加
+    created_at = redmine_issue['start_date']
+    due_date = redmine_issue['due_date']
 
     data = {
         'title': title,
@@ -102,7 +106,10 @@ def convert_issue(redmine_issue,
             close_text,
             relations_text
         ),
-        'labels': labels
+        'labels': labels,
+        #作成日時と有効期限追加
+        'created_at': closed_at,
+        'due_date': due_date
     }
 
     version = redmine_issue.get('fixed_version', None)
